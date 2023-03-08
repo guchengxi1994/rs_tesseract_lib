@@ -7,6 +7,7 @@ use std::env::current_dir;
 use std::fmt;
 use std::fs;
 use std::io::BufRead;
+use std::os::windows::process::CommandExt;
 use std::process::{Command, Stdio};
 use std::string::ToString;
 
@@ -241,6 +242,7 @@ pub fn get_tesseract_version() -> String {
     match p {
         Some(p0) => {
             let command = Command::new(p0)
+                .creation_flags(0x08000000)
                 .arg("--version")
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
@@ -393,6 +395,7 @@ fn run_tesseract(image: &Image, args: &Args) -> Option<ModelOutput> {
 
     let command = if cfg!(target_os = "windows") {
         Command::new(tess_path)
+            .creation_flags(0x08000000)
             .arg(image_arg)
             .arg(args.out_filename)
             .arg("-l")
